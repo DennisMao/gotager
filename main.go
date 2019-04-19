@@ -1,31 +1,42 @@
+//   Copyright 2019 gotager authors
+//
+//   Licensed under the Apache License, Version 2.0 (the "License");
+//   you may not use this file except in compliance with the License.
+//   You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+//   Unless required by applicable law or agreed to in writing, software
+//   distributed under the License is distributed on an "AS IS" BASIS,
+//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//   See the License for the specific language governing permissions and
+//   limitations under the License.
 package main
 
 import (
 	"bytes"
 	"flag"
 	"fmt"
+	"gotager/pkg/tagger"
 	"io/ioutil"
 	"os"
 	"os/exec"
-
-	"gotager/pkg/tagger"
 )
 
 var (
-	filePath    string // Specified a file need to add tags for
-	nameRegexp  string // A regexp filter for the name of structure to tag on.
-	prefix      string // Tag prefix.
-	tagStyle    string // Tag style,support camel-like and snake-like.
-	isBackup    bool   // If true,it will generate a backup on the same path with original go file.
-	isOverwrite bool   // If ture,it will overwrite the tag with specified prefix when it exists.
+	nameRegexp string // A regexp filter for the name of structure to tag on.
+	prefix     string // Tag prefix.
+	tagStyle   string // Tag style,support camel-like and snake-like.
+	isBackup   bool   // If true,it will generate a backup on the same path with original go file.
+	output     string // Specify a path, tagged file can be stogred in.If set,original file will not be modify and bakup file will not be generated.
 )
 
 func init() {
+	flag.StringVar(&output, "o", "", "Specify a path, tagged file can be stogred in.If set,original file will not be modify and bakup file will not be generated.")
 	flag.StringVar(&nameRegexp, "r", "*", "A regexp filter for the name of structure to tag on.")
 	flag.StringVar(&prefix, "p", "json", "Prefix of the tag.'json' by default")
-	flag.StringVar(&tagStyle, "s", "camel", "Style of the tag")
+	flag.StringVar(&tagStyle, "s", "snake", "Style of the tag")
 	flag.BoolVar(&isBackup, "b", true, "If true,it will generate a backup on the same folder with original go file.")
-	flag.BoolVar(&isOverwrite, "o", true, "If ture,it will overwrite the tag with specified prefix when it exists.")
 	flag.Usage = func() {
 		fmt.Fprintf(flag.CommandLine.Output(), "Usage of gotager:\n")
 		flag.PrintDefaults()
@@ -38,17 +49,30 @@ func init() {
 func main() {
 	flag.Parse()
 
-	filePath = os.Args[len(os.Args)-1]
+	var filePath = os.Args[len(os.Args)-1]
+	var fOrigin, fTarget *os.File
 
-	f, err := os.OpenFile(filePath, os.O_SYNC|os.O_RDWR, os.ModePerm)
+	fOrigin, err := os.OpenFile(filePath, os.O_SYNC|os.O_RDWR, os.ModePerm)
 	if err != nil {
 		fmt.Printf("Can not open file: %s ,please check the param! \n", filePath)
 		os.Exit(-1)
 		return
 	}
-	defer f.Close()
+	defer fOrigin.Close()
 
-	src, err := ioutil.ReadAll(f)
+	if output != "" {
+		fTarget, err := os.OpenFile(output, os.O_SYNC|os.O_RDWR|os.O_CREATE, os.ModePerm)
+		if err != nil {
+			fmt.Printf("Can not open file: %s ,please check the param! \n", output)
+			os.Exit(-1)
+			return
+		}
+		defer fTarget.Close()
+	} else {
+		fTarget = fOrigin
+	}
+
+	src, err := ioutil.ReadAll(fOrigin)
 	if err != nil {
 		fmt.Printf("Can not read datas from the file: %s ,please check the param! \n", filePath)
 		os.Exit(-1)
@@ -58,9 +82,8 @@ func main() {
 	buf := bytes.NewBuffer(make([]byte, 0))
 	buf.Reset()
 
-	fmt.Println(filePath)
-
-	opt := &tagger.TagOpt{isOverwrite, tagStyle}
+	// execute tag process
+	opt := &tagger.TagOpt{false, tagStyle}
 	t := tagger.New(opt)
 	err = t.Tag(src, buf, nameRegexp, prefix)
 	if err != nil {
@@ -69,12 +92,12 @@ func main() {
 		return
 	}
 
-	if isBackup {
+	if isBackup && output == "" {
 		exec.Command("cp", filePath, filePath+".bak").Run()
 	}
 
-	f.Seek(0, 0)
-	f.Write(buf.Bytes())
+	fTarget.Seek(0, 0)
+	fTarget.Write(buf.Bytes())
 	fmt.Printf("Tag successfully!")
 	os.Exit(0)
 	return

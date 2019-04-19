@@ -1,16 +1,16 @@
 # gotager
-gotager is a tiny devtool for Golang coding。
-You can add/update tags for fields in structs more easily. 
+gotager是一个go代码开发辅助工具。
+它可以让你更轻松地添加和更新结构体字段的标签。
 
-## Install
+
+## 安装
 ```
 go get -u github.com/DennisMao/gotager
 ```
 
-## Usage
+## 使用方法
 
-
-### Simple
+### 基本使用
 test.go
 ```
 package test
@@ -45,7 +45,8 @@ type Hello struct {
 }
 ```
 
+
 ## Todo
-+ Support remove tags
-+ Support inner tag param insertion
-+ Support more conversion style
++ 支持tags删除
++ 支持tags内部参数插入
++ 支持更多转换风格

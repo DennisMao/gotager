@@ -2,13 +2,25 @@ language: go
 
 go:
   - 1.11.x
-  - 1.12.x
-  - master
+
+env:
+  - GO111MODULE=on
+  global:
+    - GO_REPO_FULLNAME="github.com/DennisMao/gotager"
+
+before_install:
+ - GO_REPO_NAMESPACE=${GO_REPO_FULLNAME%/*}
+ - mkdir -p ${GOPATH}/src/${GO_REPO_NAMESPACE}
+ - ln -sv ${TRAVIS_BUILD_DIR} ${GOPATH}/src/${GO_REPO_FULLNAME}
+ - cd ${GOPATH}/src/${GO_REPO_FULLNAME}
+
+before_script:
+ - go get -t -v ./...
 
 install:
  - go get -u github.com/stretchr/testify
  - go get -u github.com/golang/lint/golint
 
 script: 
- - go test -v ./...
- - golint ./...
+ - go test -v $(go list ./... | grep -v /vendor/)
+ - golint $(go list ./... | grep -v /vendor/)

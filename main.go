@@ -40,8 +40,8 @@ func init() {
 	flag.Usage = func() {
 		fmt.Fprintf(flag.CommandLine.Output(), "Usage of gotager:\n")
 		flag.PrintDefaults()
-		fmt.Fprintf(flag.CommandLine.Output(), "Example:\n", os.Args[0])
-		fmt.Fprintf(flag.CommandLine.Output(), "        gotager -p=json ./example/test.go \n", os.Args[0])
+		fmt.Fprintf(flag.CommandLine.Output(), "Example:\n")
+		fmt.Fprintf(flag.CommandLine.Output(), "        gotager -p=json ./example/test.go \n")
 	}
 
 }

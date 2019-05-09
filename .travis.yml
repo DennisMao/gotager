@@ -18,5 +18,5 @@ install:
  - go get -u github.com/golang/lint/golint
 
 script: 
- - go test -v ./...
- - golint ./...
+ - go test -v $(go list ./... | grep -v /vendor/)
+ - golint $(go list ./... | grep -v /vendor/)

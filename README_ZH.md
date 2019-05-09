@@ -1,7 +1,7 @@
 # gotager
 gotager是一个go代码开发辅助工具。
 它可以让你更轻松地添加和更新结构体字段的标签。
-
+[![License](http://img.shields.io/:license-Apache%202-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
 ## 安装
 ```

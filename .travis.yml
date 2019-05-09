@@ -14,6 +14,9 @@ before_install:
  - ln -sv ${TRAVIS_BUILD_DIR} ${GOPATH}/src/${GO_REPO_FULLNAME}
  - cd ${GOPATH}/src/${GO_REPO_FULLNAME}
 
+before_script:
+ - go get -t -v ./...
+
 install:
  - go get -u github.com/stretchr/testify
  - go get -u github.com/golang/lint/golint

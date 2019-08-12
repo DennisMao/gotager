@@ -41,7 +41,7 @@ package test
 
 type Hello struct {
 	Name		string	`json:"name"`
-	Id		    int64	`bson:"hi" json:"Id"`
+	Id		int64	`bson:"hi" json:"Id"`
 	Email		string	`json:"email"`
 	N1N2		string	`json:"n_1_n2"`
 	_SET		string	`json:"_set"`

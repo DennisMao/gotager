@@ -2,7 +2,7 @@
 [![License](http://img.shields.io/:license-Apache%202-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
 gotager is a tiny devtool for Golang coding。
-You can add/update tags for fields in structs more easily.   
+You can add/update tags for struct's fields more easily.   
 
 [简体中文](https://github.com/DennisMao/gotager/blob/master/README_ZH.md)
 

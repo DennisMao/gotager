@@ -31,7 +31,7 @@ type Hello struct {
 
 run gotager tool for test.go
 ```
-$./gotaget  test.go 
+$./gotager  test.go 
 
 ```
 
